@@ -56,12 +56,12 @@ class perceptronPlot:
         X, Y = np.meshgrid(x_values, y_values)
         
         z_values = np.array(w1*X + w2*Y + w3)
-        zFunction = np.where(z_values > 0, z_values, 0)
-        print(f"Epoch {i}")
-        print(f"Valor para 0,0 = {w1*0 + w2*0 + w3} = 0")
-        print(f"Valor para 1,0 = {w1*1 + w2*0 + w3} = 0")
-        print(f"Valor para 0,1 = {w1*0 + w2*1+ w3} = 0")
-        print(f"Valor para 0,0 = {w1*1 + w2*1 + w3} = 1")
+        zFunction = np.where(z_values > 0, 1, 0)
+        #print(f"Epoch {i}")
+        #print(f"Valor para 0,0 = {w1*0 + w2*0 + w3} = 0")
+        #print(f"Valor para 1,0 = {w1*1 + w2*0 + w3} = 0")
+        #print(f"Valor para 0,1 = {w1*0 + w2*1+ w3} = 0")
+        #print(f"Valor para 0,0 = {w1*1 + w2*1 + w3} = 1")
 
         plt.cla()
         self.ax.set_title(f"Epoch {i} con MSE:{round(error[i],4)}\n[{w1},{w2},{w3}]")
@@ -73,8 +73,8 @@ class perceptronPlot:
     def plotPlane3D(self, epoches, weights,error,listLimits, dataPoints):
         totalIterations = len(epoches)
         print(totalIterations)
-        animation = FuncAnimation(plt.gcf(), self.animatePlane, frames=range(totalIterations), fargs=(weights,listLimits, dataPoints,error), interval=10000)
-        plt.waitforbuttonpress()
+        animation = FuncAnimation(plt.gcf(), self.animatePlane, frames=range(totalIterations), fargs=(weights,listLimits, dataPoints,error), interval=100)
+        plt.get_current_fig_manager().full_screen_toggle()
         plt.show()
 
 

@@ -5,8 +5,8 @@ import csv
 import random
 class Perceptron:
     def __init__(self, learningRate, umbral):
-        #self.weights = [random.uniform(0,1),random.uniform(0,1),random.uniform(0,1)]
-        self.weights = [0,0,0]
+        self.weights = [-random.uniform(0,1),-random.uniform(0,1),-random.uniform(0,1)]
+        #self.weights = [0,0,0]
         self.learningRate = learningRate
         self.umbral = umbral  
         self.error = 0
@@ -26,10 +26,15 @@ class Perceptron:
         for i in range(len(self.weights)):
             print(f"    w[{i}] = {self.weights[i]} ==> {self.weights[i] + self.learningRate*gradient*(x[i])}")
             self.weights[i] = self.weights[i] + self.learningRate*gradient*(x[i])
-            self.writeData(i, gradient)
+        
+    def reLu(self, X):
+        if round(self.dotProduct(X)) > 0:
+            return 1
+        else:
+            return 0
 
 
-    def train(self,dataX,dataY,epochSize = 100):
+    def train(self,dataX,dataY,epochSize = 10000):
         self.writeData(0, 0)
         for epoch in range(epochSize):
             print(f"=======EJECUTANDDO EPOCH {epoch+1}=========")
@@ -39,11 +44,15 @@ class Perceptron:
                 Z = self.dotProduct(x)
                 yCalculated = Z if Z >= self.umbral else 0
                 error = y-yCalculated
-                self.printProcess(x,y,yCalculated,error)
-                errorGradiente = -1 if Z>0 else 0
+                
+                if Z > 0:
+                    gradiente = 2*(Y - yCalculated) #-2(Y-y')
+                elif Z < 0:
+                    gradiente = 0
+                self.printProcess(x,y,yCalculated,error, gradiente)
                 if error != 0:
                     self.updateWeights(error, epoch, x)
-            
+            self.writeData(epoch, error)
   
         return self.weights, epoch
 
@@ -53,8 +62,8 @@ class Perceptron:
             writerFile = csv.writer(csvFile)
             writerFile.writerow([epoch, error, self.weights[0], self.weights[1], self.weights[2]])
 
-    def printProcess(self, X,Y,yCalculated, error):
-        print(f"\n-Entrenando {X} = {Y} Ycalculado: {yCalculated} pesos: {self.weights} Error: {error}")  
+    def printProcess(self, X,Y,yCalculated, error, gradiente):
+        print(f"\n-Entrenando {X} = {Y} Ycalculado: {yCalculated} pesos: {self.weights} Error: {error} Grad: {gradiente}")  
 
     def showConvergence(self, convergence):
         plt.plot(convergence)
@@ -71,9 +80,18 @@ def loadData():
 
 def main():
     X,Y = loadData()
-    percep = Perceptron(1, 0)
+    percep = Perceptron(0.1, 0)
     
-    percep.train(X,Y, epochSize=20)
+    pesos, epoch =percep.train(X,Y, epochSize=100)
+
+    w1,w2,b = pesos[0],pesos[1],pesos[2]
+
     
+
+    print(f"0,0,0 = {percep.reLu([0,0,1])} ")
+    print(f"0,1,0 = {percep.reLu([0,1,1])}")
+    print(f"1,0,0 = {percep.reLu([1,0,1])}")
+    print(f"1,1,1 = {percep.reLu([1,1,1])}")
+
     import graph
 main()
