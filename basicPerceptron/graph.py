@@ -37,7 +37,7 @@ class perceptronPlot:
 
         self.plotPlane3D(epoches,weights,error,LimitsMinMax, dataPoints)
 
-        
+    
 
 
     def animatePlane(self, i, weights, listLimits, dataPoints, error):
@@ -49,30 +49,41 @@ class perceptronPlot:
         xLimits = listLimits[0]
         yLimits = listLimits[1]
 
-        x_values = np.linspace(round(xLimits[0]-10, 0), round(xLimits[1]+10, 0), 100)
-        y_values = np.linspace(round(yLimits[0]-10, 0), round(yLimits[1]+10, 0), 100)
+        x_values = np.linspace(round(xLimits[0]-1, 0), round(xLimits[1]+1, 0), 100)
+        
+        
+        y_values = np.linspace(round(yLimits[0]-1, 0), round(yLimits[1]+1, 0), 100)
         X, Y = np.meshgrid(x_values, y_values)
+        
         z_values = np.array(w1*X + w2*Y + w3)
+        zFunction = np.where(z_values > 0, z_values, 0)
+        print(f"Epoch {i}")
+        print(f"Valor para 0,0 = {w1*0 + w2*0 + w3} = 0")
+        print(f"Valor para 1,0 = {w1*1 + w2*0 + w3} = 0")
+        print(f"Valor para 0,1 = {w1*0 + w2*1+ w3} = 0")
+        print(f"Valor para 0,0 = {w1*1 + w2*1 + w3} = 1")
 
         plt.cla()
-        self.ax.set_title(f"Epoch {i} con MSE:{round(error[i],4)}")
+        self.ax.set_title(f"Epoch {i} con MSE:{round(error[i],4)}\n[{w1},{w2},{w3}]")
         self.plotPoints3D(dataPoints)
-        self.ax.plot_surface(X, Y, z_values)
-        
+        self.ax.plot_surface(X, Y, zFunction, alpha=0.5)
+        #self.ax.plot(x_values,y_values)
     
 
     def plotPlane3D(self, epoches, weights,error,listLimits, dataPoints):
-        totalIterations = list(epoches)[-1]
-        animation = FuncAnimation(plt.gcf(), self.animatePlane, frames=range(totalIterations), fargs=(weights,listLimits, dataPoints,error), interval=1)
+        totalIterations = len(epoches)
+        print(totalIterations)
+        animation = FuncAnimation(plt.gcf(), self.animatePlane, frames=range(totalIterations), fargs=(weights,listLimits, dataPoints,error), interval=10000)
+        plt.waitforbuttonpress()
         plt.show()
+
 
     
     def plotPoints3D(self, dataPoints):
         x = dataPoints.iloc[:,0]
         y = dataPoints.iloc[:,1]
         z = dataPoints.iloc[:,2]
-    
-        colors = ['black' if val == 1 else 'green' for val in z]
+        colors = ['blue' if val == 1 else 'green' for val in z]
         self.ax.scatter(x,y,z, s=100, c=colors)
         self.ax.set_xlabel("X1")
         self.ax.set_ylabel("X2")
