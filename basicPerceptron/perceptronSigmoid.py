@@ -5,8 +5,8 @@ import csv
 import random
 class Perceptron:
     def __init__(self, learningRate, umbral):
-        #self.weights = [random.uniform(-1,1),random.uniform(-1,1),random.uniform(-1,1)]
-        self.weights = [random.uniform(0,1),random.uniform(0,1),random.uniform(0,1)]
+        self.weights = [random.uniform(-1,1),random.uniform(-1,1),random.uniform(-1,1)]
+        #self.weights = [random.uniform(0,1),random.uniform(0,1),random.uniform(0,1)]
         #self.weights = [0,0,0]
         self.learningRate = learningRate
         self.umbral = umbral  
@@ -28,12 +28,12 @@ class Perceptron:
             print(f"    w[{i}] = {self.weights[i]} ==> {self.weights[i] + self.learningRate*gradient*(x[i])}")
             self.weights[i] = self.weights[i] - self.learningRate*gradient*(x[i])
         
-    def reLu(self, X):
-        if round(self.dotProduct(X)) > 0:
-            return 1
-        else:
-            return 0
+    def sigmoid(self, Z):
+        return 1/(1+np.exp(-1*Z))
 
+
+    def sigmoid_predict(self, X):
+        return 1/(1+np.exp(-1*self.dotProduct(X)))
 
     def train(self,dataX,dataY,epochSize = 10000):
         self.writeData(0, 0)
@@ -42,18 +42,20 @@ class Perceptron:
             for xOriginal,Y in zip(dataX, dataY):
                 x = np.append(xOriginal, 1)
                 y = Y
+                #Z
                 Z = self.dotProduct(x)
-                yCalculated = Z if Z >= self.umbral else 0.1*Z
+                #Activacion
+                yCalculated = self.sigmoid(Z)
+                #Error
+                Error = ((Y-yCalculated)**2)/2
+                
+                #Gradiente 
+                Gradiente = -1*yCalculated*(1-yCalculated)*(Y-yCalculated)
 
-                if Z >  0:
-                    gradiente = -2*(Y - yCalculated) #-2(Y-y')
-                elif Z < 0:
-                    gradiente =  -2*(Y - yCalculated)*0.1 #Why this?
-                    
-                self.printProcess(x,y,Z,yCalculated,0, gradiente)
-                if gradiente != 0:
-                    self.updateWeights(gradiente, epoch, x)
-            self.writeData(epoch, gradiente)
+                #self.printProcess(x,y,Z,yCalculated,0, Error)
+                if Error != 0:
+                    self.updateWeights(Gradiente, epoch, x)
+            self.writeData(epoch, Gradiente)
   
         return self.weights, epoch
 
@@ -81,19 +83,11 @@ def loadData():
 
 def main():
     X,Y = loadData()
-    percep = Perceptron(0.1, 0)
+    percep = Perceptron(0.5, 0)
     
     pesos, epoch =percep.train(X,Y, epochSize=100)
 
     w1,w2,b = pesos[0],pesos[1],pesos[2]
-
-    
-
-    print(f"0,0,0 = {percep.reLu([0,0,1])} ")
-    print(f"0,1,0 = {percep.reLu([0,1,1])}")
-    print(f"1,0,0 = {percep.reLu([1,0,1])}")
-    print(f"1,1,1 = {percep.reLu([1,1,1])}")
-    #print(f"2,2,1 = {percep.reLu([2,2,1])}") con este no funcionas
 
 
     import graph

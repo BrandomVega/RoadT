@@ -56,7 +56,8 @@ class perceptronPlot:
         X, Y = np.meshgrid(x_values, y_values)
         
         z_values = np.array(w1*X + w2*Y + w3)
-        zFunction = np.where(z_values > 0, 1, 0)
+        zFunction = np.array(1/(1+np.exp(-1*z_values)))
+        #zFunction = np.where(z_values > 0, 1, 0)
         #print(f"Epoch {i}")
         #print(f"Valor para 0,0 = {w1*0 + w2*0 + w3} = 0")
         #print(f"Valor para 1,0 = {w1*1 + w2*0 + w3} = 0")
